@@ -884,6 +884,90 @@ pub fn selectable(ui: &mut GuiContext<'_>, text: &str, selected: bool) -> bool {
     clicked
 }
 
+/// File / Edit / View trigger in the app bar. Toggles the Lamina combo popup (`open_combo`).
+/// Hovering another item while a menu is open switches to it (desktop menubar behaviour).
+/// Returns the owner rect (for [`popup_list`]) and the next x.
+pub fn menu_bar_item(
+    ui: &mut GuiContext<'_>,
+    id: Id,
+    label: &str,
+    x: f32,
+    y: f32,
+    h: f32,
+) -> (f32, Rect) {
+    let w = DrawList::text_width(label, FONT_SCALE) + 18.0;
+    let rect = Rect::from_pos_size(x, y, w, h);
+    let hovered = ui.pointer_in(rect);
+    if hovered {
+        ui.state.set_hot(id);
+    }
+    let open = ui.state.open_combo == Some(id);
+    if hovered && ui.input.primary_pressed {
+        ui.state.active = Some(id);
+        if open {
+            ui.state.open_combo = None;
+        } else {
+            ui.state.open_combo = Some(id);
+        }
+    } else if hovered && ui.state.open_combo.is_some() && ui.state.open_combo != Some(id) {
+        ui.state.open_combo = Some(id);
+    }
+    let open = ui.state.open_combo == Some(id);
+    if open || hovered {
+        ui.panel_rounded(rect, style::BUTTON_HOVER, style::RADIUS_SM);
+    }
+    ui.label_at(
+        rect.min_x + 9.0,
+        rect.min_y + 7.0,
+        label,
+        style::TEXT_DIM,
+        FONT_SCALE,
+    );
+    (x + w + 2.0, rect)
+}
+
+/// Command dropdown using the same overlay popup as [`combo`].
+///
+/// While `id` is `open_combo`, queues the list under `owner`. The clicked index is
+/// returned on the following frame (same contract as combo).
+pub fn popup_list(
+    ui: &mut GuiContext<'_>,
+    id: Id,
+    owner: Rect,
+    items: &[&str],
+    width: f32,
+) -> Option<usize> {
+    let mut clicked = None;
+    if let Some((pick_id, idx)) = ui.state.combo_pick.take() {
+        if pick_id == id {
+            if idx < items.len() {
+                clicked = Some(idx);
+            }
+        } else {
+            ui.state.combo_pick = Some((pick_id, idx));
+        }
+    }
+
+    if ui.state.open_combo == Some(id) {
+        let menu_h = ROW_H * items.len() as f32;
+        let below = owner.max_y + 2.0;
+        let open_down = below + menu_h <= ui.screen_h - 4.0;
+        let menu = if open_down {
+            Rect::from_pos_size(owner.min_x, below, width, menu_h)
+        } else {
+            Rect::from_pos_size(
+                owner.min_x,
+                (owner.min_y - menu_h - 2.0).max(0.0),
+                width,
+                menu_h,
+            )
+        };
+        ui.queue_combo_menu(id, menu, owner, items, usize::MAX);
+    }
+
+    clicked
+}
+
 pub fn combo(ui: &mut GuiContext<'_>, text: &str, selected: &mut usize, items: &[&str]) -> bool {
     let id = Id::new(text).child("combo");
     let mut changed = false;
@@ -1083,7 +1167,7 @@ pub(crate) fn draw_combo_menu(
             ui.state.combo_pick = Some((combo_id, i));
             ui.state.open_combo = None;
         }
-        let bg = if i == selected {
+        let bg = if selected < items.len() && i == selected {
             style::SELECTED_BG
         } else if hovered {
             style::BUTTON_HOVER

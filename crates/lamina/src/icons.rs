@@ -58,6 +58,7 @@ pub enum Icon {
     Search,
     GripVertical,
     Play,
+    Pause,
     Menu,
     ArrowRight,
     Calendar,
@@ -70,7 +71,7 @@ pub enum Icon {
     RotateCw,
 }
 
-pub const ICON_COUNT: usize = 59;
+pub const ICON_COUNT: usize = 60;
 
 impl Icon {
     pub const ALL: [Icon; ICON_COUNT] = [
@@ -123,6 +124,7 @@ impl Icon {
         Icon::Search,
         Icon::GripVertical,
         Icon::Play,
+        Icon::Pause,
         Icon::Menu,
         Icon::ArrowRight,
         Icon::Calendar,
@@ -191,6 +193,7 @@ impl Icon {
             Icon::Search => LucideIcon::Search,
             Icon::GripVertical => LucideIcon::GripVertical,
             Icon::Play => LucideIcon::Play,
+            Icon::Pause => LucideIcon::Pause,
             Icon::Menu => LucideIcon::Menu,
             Icon::ArrowRight => LucideIcon::ArrowRight,
             Icon::Calendar => LucideIcon::Calendar,

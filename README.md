@@ -16,6 +16,7 @@ It is domain-neutral: no terrain or character types, no product chrome. Apps own
 - **wgpu 24** — Lamina draws into the app’s existing surface
 - **No winit** — the host owns input and the event loop (Terra/Visage use winit 0.30)
 - **No domain types** — widgets and layout only; products keep their own crates
+- **Timeline / graph** — `timeline_ruler`, `playhead`, `track_row`, `key_marker`, `curve_graph`, `record_button` (domain-neutral; Visage composes them)
 
 | Crate | Role |
 |-------|------|
