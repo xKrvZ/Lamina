@@ -1,0 +1,11 @@
+[package]
+name = "lamina-test-gpu"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Headless GPU harness for Lamina tests (dev-only)"
+publish = false
+
+[dependencies]
+wgpu = { workspace = true }
+pollster = { workspace = true }

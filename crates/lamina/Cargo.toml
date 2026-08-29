@@ -1,0 +1,19 @@
+[package]
+name = "lamina"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Reusable wgpu immediate-mode UI toolkit and design system"
+
+[dependencies]
+wgpu = { workspace = true }
+bytemuck = { workspace = true }
+glam = { workspace = true }
+log = { workspace = true }
+fontdue = "0.9"
+lucide-icons = "0.575"
+serde = { workspace = true }
+
+[dev-dependencies]
+lamina-test-gpu = { workspace = true }
+serde_json = { workspace = true }
